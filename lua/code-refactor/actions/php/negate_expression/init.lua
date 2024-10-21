@@ -1,24 +1,26 @@
 local ts_utils = require("nvim-treesitter.ts_utils")
-local utils = require('code-refactor.utils')
+local utils = require("code-refactor.utils")
 
 local M = {
-  title = "Negate expression"
+  title = "Negate expression",
 }
 
-M.is_available = function ()
+M.is_available = function()
   local node = ts_utils.get_node_at_cursor()
-  while node ~= nil
+  while
+    node ~= nil
     and node:type() ~= "boolean"
     and node:type() ~= "function_call_expression"
     and node:type() ~= "binary_expression"
-    and node:type() ~= "unary_op_expression" do
+    and node:type() ~= "unary_op_expression"
+  do
     node = node:parent()
   end
 
   return node
 end
 
-M.get_negated_expression = function (node)
+M.get_negated_expression = function(node)
   local buf = vim.api.nvim_get_current_buf()
   local expression = vim.treesitter.get_node_text(node, buf)
 
@@ -61,9 +63,14 @@ M.run = function()
     return
   end
 
-  utils.replace_text_in_buffer(start_row, start_col, end_row, end_col, vim.split(new_expression, "\n"))
+  utils.replace_text_in_buffer(
+    start_row,
+    start_col,
+    end_row,
+    end_col,
+    vim.split(new_expression, "\n")
+  )
   vim.api.nvim_win_set_cursor(win, cursor_pos)
 end
 
 return M
-

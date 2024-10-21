@@ -1,9 +1,9 @@
 local ts_utils = require("nvim-treesitter.ts_utils")
-local utils = require('code-refactor.utils')
+local utils = require("code-refactor.utils")
 local negate_expression = require("code-refactor.actions.php.negate_expression")
 
 local M = {
-  title = "Flip ternary"
+  title = "Flip ternary",
 }
 
 M.is_available = function()
@@ -40,4 +40,3 @@ M.run = function()
 end
 
 return M
-
