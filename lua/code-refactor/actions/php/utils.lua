@@ -58,6 +58,31 @@ M.get_outer_scope_variables = function(func_node)
   return vim.tbl_keys(outer_vars)
 end
 
+M.get_single_statement_function_body = function(body_node)
+  if not body_node or body_node:type() ~= "compound_statement" then
+    return false, nil
+  end
+
+  local first_named_child = body_node:named_child(0)
+  if not first_named_child then
+    return false, nil
+  end
+
+  if first_named_child:type() == "return_statement" then
+    return true, vim.treesitter.get_node_text(first_named_child, 0)
+  end
+
+  if first_named_child:type() ~= "expression_statement" then
+    return false, nil
+  end
+
+  if body_node:named_child_count() ~= 1 then
+    return false, nil
+  end
+
+  return true, vim.treesitter.get_node_text(first_named_child, 0):gsub(";$", "")
+end
+
 M.get_function_node_at_cursor = function()
   local node = ts_utils.get_node_at_cursor()
 

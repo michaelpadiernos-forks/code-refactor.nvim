@@ -42,22 +42,17 @@ M.run = function()
     return_type_text = ": " .. func_info.return_type
   end
 
-  local buf = vim.api.nvim_get_current_buf()
-
   -- Simplify return statement when converting to arrow.
   if node:type() ~= "arrow_function" then
     local body_node = node:field("body")[1]
-    if body_node:type() ~= "compound_statement" then
-      return
-    end
 
-    local return_stmt_node = body_node:named_child(0)
-    if not return_stmt_node or return_stmt_node:type() ~= "return_statement" then
+    local can_convert, body_text = php_utils.get_single_statement_function_body(body_node)
+    if not can_convert or not body_text then
       vim.print("Can't convert to arrow function because function body is too complex.")
       return
     end
 
-    func_info.body = vim.treesitter.get_node_text(return_stmt_node:named_child(0), buf)
+    func_info.body = body_text
   end
 
   -- Construct the new function.
