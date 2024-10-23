@@ -69,7 +69,7 @@ M.get_single_statement_function_body = function(body_node)
   end
 
   if first_named_child:type() == "return_statement" then
-    return true, vim.treesitter.get_node_text(first_named_child, 0)
+    return true, vim.treesitter.get_node_text(first_named_child:child(1), 0)
   end
 
   if first_named_child:type() ~= "expression_statement" then
