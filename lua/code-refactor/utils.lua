@@ -1,4 +1,5 @@
 local M = {}
+local config = require("code-refactor").__conf
 
 M.replace_text_in_buffer = function(start_row, start_col, end_row, end_col, new_lines)
   -- Recover the line content from before and after the function.
@@ -15,38 +16,15 @@ M.replace_text_in_buffer = function(start_row, start_col, end_row, end_col, new_
   vim.api.nvim_buf_set_lines(0, start_row, end_row + 1, false, new_lines)
 
   local new_end_row = start_row + #new_lines
-  local new_end_row_text = vim.api.nvim_buf_get_lines(
-    0,
-    new_end_row - 1,
-    new_end_row,
-    false
-  )[1]
+  local new_end_row_text = vim.api.nvim_buf_get_lines(0, new_end_row - 1, new_end_row, false)[1]
 
   -- Format the newly created function.
-  vim.lsp.buf.format({
+  config.format({
     range = {
-      ["start"] = { start_row + 1, start_col },
-      ["end"] = { start_row + #new_lines, #new_end_row_text },
-    }
+      start = { start_row + 1, start_col },
+      ["end"] = { new_end_row, #new_end_row_text },
+    },
   })
-end
-
-M.table_keys = function(t)
-  local keys = {}
-  for k, _ in pairs(t) do
-    table.insert(keys, k)
-  end
-  return keys
-end
-
-M.filter_table = function(t, filterIter)
-  local out = {}
-
-  for k, v in pairs(t) do
-    if filterIter(v, k, t) then out[k] = v end
-  end
-
-  return out
 end
 
 return M

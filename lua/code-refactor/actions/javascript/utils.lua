@@ -1,4 +1,4 @@
-local ts_utils = require('nvim-treesitter.ts_utils')
+local ts_utils = require("nvim-treesitter.ts_utils")
 
 local M = {}
 
@@ -6,10 +6,12 @@ M.get_function_node_at_cursor = function()
   local node = ts_utils.get_node_at_cursor()
 
   -- 'function' means non-arrow anonymous function
-  while node ~= nil
-    and node:type() ~= 'function_declaration'
-    and node:type() ~= 'function'
-    and node:type() ~= 'arrow_function' do
+  while
+    node ~= nil
+    and node:type() ~= "function_declaration"
+    and node:type() ~= "function"
+    and node:type() ~= "arrow_function"
+  do
     node = node:parent()
   end
 
@@ -21,9 +23,11 @@ M.get_function_node_at_cursor = function()
 end
 
 M.get_function_info_from_node = function(node)
-  if node:type() ~= "function_declaration"
+  if
+    node:type() ~= "function_declaration"
     and node:type() ~= "function"
-    and node:type() ~= "arrow_function" then
+    and node:type() ~= "arrow_function"
+  then
     return nil
   end
 
@@ -34,7 +38,7 @@ M.get_function_info_from_node = function(node)
   local buf = vim.api.nvim_get_current_buf()
   local start_row, start_col, end_row, end_col = node:range()
   local children = ts_utils.get_named_children(node)
-  if node:type() == 'function_declaration' then
+  if node:type() == "function_declaration" then
     func_name = vim.treesitter.get_node_text(children[1], buf)
     body = vim.treesitter.get_node_text(children[#children], buf)
 
@@ -43,11 +47,11 @@ M.get_function_info_from_node = function(node)
     end
   else
     local parent = node:parent()
-    if parent:type() == 'variable_declarator' then
+    if parent:type() == "variable_declarator" then
       start_row, start_col, _, _ = parent:parent():range()
       func_name = vim.treesitter.get_node_text(parent:named_child(0), buf)
     else
-      func_name = ''
+      func_name = ""
     end
 
     body = vim.treesitter.get_node_text(children[#children], buf)

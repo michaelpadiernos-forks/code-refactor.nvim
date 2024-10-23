@@ -1,6 +1,6 @@
-local js_utils = require "code-refactor.actions.javascript.utils"
-local ts_utils = require('nvim-treesitter.ts_utils')
-local utils = require('code-refactor.utils')
+local js_utils = require("code-refactor.actions.javascript.utils")
+local ts_utils = require("nvim-treesitter.ts_utils")
+local utils = require("code-refactor.utils")
 local M = {}
 
 local function has_braces(node)
@@ -9,7 +9,7 @@ local function has_braces(node)
   end
 
   local children = ts_utils.get_named_children(node)
-  return children[#children]:type() == 'statement_block'
+  return children[#children]:type() == "statement_block"
 end
 
 local function get_title(node)
@@ -51,7 +51,7 @@ M.run = function()
   else
     local body_node = children[#children]
     local return_stmt_node = body_node:named_child(0)
-    if return_stmt_node and return_stmt_node:type() == 'return_statement' then
+    if return_stmt_node and return_stmt_node:type() == "return_statement" then
       func_info.body = vim.treesitter.get_node_text(return_stmt_node:named_child(0), buf)
     end
   end

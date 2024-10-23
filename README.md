@@ -60,6 +60,6 @@ require("code-refactor").setup({
 |                  **General** |            |            |
 |                 Flip ternary |    yes     |    yes     |
 |            Negate expression |    yes     |    yes     |
+|       Convert arrow function |    yes     |    yes     |
 |               **JavaScript** |            |            |
-|       Convert arrow function |    yes     |            |
 | Toggle arrow function braces |    yes     |            |
