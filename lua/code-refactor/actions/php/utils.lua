@@ -2,6 +2,62 @@ local ts_utils = require("nvim-treesitter.ts_utils")
 
 local M = {}
 
+M.get_outer_scope_variables = function(func_node)
+  local bufnr = vim.api.nvim_get_current_buf()
+
+  local used_vars = {}
+  local declared_vars = {}
+
+  local function collect_vars(node)
+    if not node then
+      return
+    end
+    local node_type = node:type()
+
+    -- Collect parameters
+    if node_type == "simple_parameter" then
+      local var_node = node:field("name")[1]
+      if var_node then
+        local var_name = vim.treesitter.get_node_text(var_node, bufnr)
+        declared_vars[var_name] = true
+      end
+    end
+
+    -- Collect variable assignments (local variables)
+    if node_type == "assignment_expression" then
+      local left = node:child(0)
+      if left and left:type() == "variable_name" then
+        local var_name = vim.treesitter.get_node_text(left, bufnr)
+        declared_vars[var_name] = true
+      end
+    end
+
+    -- Collect variable usages
+    if node_type == "variable_name" then
+      local var_name = vim.treesitter.get_node_text(node, bufnr)
+      used_vars[var_name] = true
+    end
+
+    -- Recurse into child nodes
+    for child in node:iter_children() do
+      collect_vars(child)
+    end
+  end
+
+  -- Collect variables that are used but not defined in the function
+  collect_vars(func_node)
+
+  -- Subtract declared variables from used variables
+  local outer_vars = {}
+  for var_name, _ in pairs(used_vars) do
+    if not declared_vars[var_name] then
+      outer_vars[var_name] = true
+    end
+  end
+
+  return vim.tbl_keys(outer_vars)
+end
+
 M.get_function_node_at_cursor = function()
   local node = ts_utils.get_node_at_cursor()
 
@@ -55,11 +111,14 @@ M.get_function_info_from_node = function(node)
 
   local start_row, start_col, end_row, end_col = node:range()
 
+  local outer_scope_vars = M.get_outer_scope_variables(node)
+
   return {
     func_name = func_name,
     params = params,
     return_type = return_type,
     body = body,
+    outer_scope_vars = outer_scope_vars,
     start_row = start_row,
     start_col = start_col,
     end_row = end_row,

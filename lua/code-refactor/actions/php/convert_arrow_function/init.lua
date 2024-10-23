@@ -65,9 +65,15 @@ M.run = function()
   if node:type() == "function_definition" or node:type() == "anonymous_function" then
     new_func = "fn" .. func_info.params .. return_type_text .. " => " .. func_info.body
   else
+    local use_text = ""
+    if #func_info.outer_scope_vars > 0 then
+      use_text = " use (" .. table.concat(func_info.outer_scope_vars, ", ") .. ") "
+    end
+
     new_func = "function "
       .. (func_info.func_name or "")
       .. func_info.params
+      .. use_text
       .. return_type_text
       .. " {\n  return "
       .. func_info.body
