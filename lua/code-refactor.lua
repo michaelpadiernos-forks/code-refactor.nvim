@@ -24,7 +24,7 @@ function M.setup(cfg)
       action.run()
     end
   end, {
-    nargs = 1,
+    nargs = '+',
     complete = function(arglead)
       return vim.tbl_filter(function(arg)
         return arg:match("^" .. arglead)
@@ -69,7 +69,6 @@ function M.show_code_actions()
 
   vim.ui.select(actions.list, {
     prompt = "Code actions",
-    telescope = require("telescope.themes").get_cursor(),
     format_item = function(item)
       return require("code-refactor.actions." .. actions.type .. "." .. item).title
     end,
